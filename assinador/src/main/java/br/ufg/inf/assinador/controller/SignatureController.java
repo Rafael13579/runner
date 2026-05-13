@@ -1,12 +1,14 @@
 package br.ufg.inf.assinador.controller;
 
-import br.ufg.inf.assinador.dtos.SignRequest;
-import br.ufg.inf.assinador.dtos.ValidateRequest;
+import br.ufg.inf.assinador.domain.SignRequest;
+import br.ufg.inf.assinador.domain.SignatureResponse;
+import br.ufg.inf.assinador.domain.ValidateRequest;
 import br.ufg.inf.assinador.service.SignatureService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api")
@@ -19,43 +21,12 @@ public class SignatureController {
     }
 
     @PostMapping("/sign")
-    public ResponseEntity<?> sign(@RequestBody SignRequest request) {
-        
-        if (request.message == null || request.message.isBlank()) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of("error", "Mensagem é obrigatória"));
-        }
-
-        if (request.pin == null || request.pin.isBlank()) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of("error", "PIN é obrigatório"));
-        }
-
-        String signature = service.sign(request.message, request.pin);
-
-        return ResponseEntity.ok(Map.of(
-                "signature", signature,
-                "status", "SUCCESS"
-        ));
+    public ResponseEntity<SignatureResponse> sign(@RequestBody SignRequest request) {
+        return ResponseEntity.ok(service.sign(request));
     }
 
     @PostMapping("/validate")
-    public ResponseEntity<?> validate(@RequestBody ValidateRequest request) {
-
-        if (request.message == null || request.message.isBlank()) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of("error", "Mensagem é obrigatória"));
-        }
-
-        if (request.signature == null || request.signature.isBlank()) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of("error", "Assinatura é obrigatória"));
-        }
-
-        boolean valid = service.validate(request.message, request.signature, request.publicKey);
-
-        return ResponseEntity.ok(Map.of(
-                "valid", valid
-        ));
+    public ResponseEntity<SignatureResponse> validate(@RequestBody ValidateRequest request) {
+        return ResponseEntity.ok(service.validate(request));
     }
 }
