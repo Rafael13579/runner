@@ -3,11 +3,11 @@ name: Release
 on:
   push:
     tags:
-      - 'v*' # Dispara quando você cria uma tag tipo v0.1.0
+      - 'v*'
 
 permissions:
-  contents: write    # Permite criar o Release
-  id-token: write    # Necessário para a assinatura do Cosign
+  contents: write
+  id-token: write
   packages: write
 
 jobs:
@@ -22,10 +22,12 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.25' 
+          go-version: '1.25'
 
-      - name: Install Cosign
+      - name: Install Cosign (Versão Fixa)
         uses: sigstore/cosign-installer@main
+        with:
+          cosign-release: 'v2.2.3' 
 
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
