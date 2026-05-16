@@ -8,7 +8,7 @@ before:
 
 builds:
   - main: ./cmd/assinatura/main.go
-  - env:
+    env:
       - CGO_ENABLED=0
     goos:
       - linux
