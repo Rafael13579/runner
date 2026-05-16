@@ -17,21 +17,22 @@ builds:
     goarch:
       - amd64
       - arm64
-    # Injeta a versão na sua variável Version dentro do pacote cli
     ldflags:
       - -s -w -X github.com/kyriosdata/assinatura/cli.Version={{.Version}}
 
 archives:
   - name_template: "{{ .ProjectName }}-{{ .Version }}-{{ .Os }}-{{ .Arch }}"
+    formats: ["tar.gz"]
     format_overrides:
       - goos: windows
-        format: zip
+        formats: ["zip"]
 
 checksum:
   name_template: 'checksums.txt'
 
+
 snapshot:
-  name_template: "{{ incpatch .Version }}-next"
+  version_template: "{{ incpatch .Version }}-next"
 
 changelog:
   sort: asc
@@ -40,7 +41,10 @@ changelog:
       - '^docs:'
       - '^test:'
 
-# US-05.3: Assinatura com Cosign
+
 signs:
-  - artifacts: checksum
-    args: ["sign-blob", "--output-signature", "${signature}", "${artifact}", "--yes"]
+  - cmd: cosign
+    certificate: '${artifact}.pem'
+    signature: '${artifact}.sig'
+    artifacts: checksum
+    args: ["sign-blob", "--output-signature", "${signature}", "--output-certificate", "${certificate}", "${artifact}", "--yes"]
