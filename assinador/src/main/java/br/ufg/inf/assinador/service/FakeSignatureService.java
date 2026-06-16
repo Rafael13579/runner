@@ -12,21 +12,33 @@ public class FakeSignatureService implements SignatureService {
 
     @Override
     public SignatureResponse sign(SignRequest request) {
-        if (request.getContent() == null) {
-            return new SignatureResponse(null, false, "Content inválido");
+        if (request == null || request.getContent() == null || request.getContent().trim().isEmpty()) {
+            return new SignatureResponse(null, false, "Erro do Usuário: O parâmetro '--content' é obrigatório e não pode estar vazio.", true);
+        }
+        if (request.getToken() == null || request.getToken().trim().isEmpty()) {
+            return new SignatureResponse(null, false, "Erro do Usuário: O parâmetro '--token' é obrigatório.", true);
         }
 
-        return new SignatureResponse(FAKE_SIGNATURE, true, "OK");
+        return new SignatureResponse(FAKE_SIGNATURE, true, "Assinatura gerada com sucesso", false);
     }
 
     @Override
     public SignatureResponse validate(ValidateRequest request) {
-        boolean valid = FAKE_SIGNATURE.equals(request.getSignature());
+        // Validação estrita de parâmetros da US-02.3
+        if (request == null || request.getContent() == null || request.getContent().trim().isEmpty()) {
+            return new SignatureResponse(null, false, "Erro do Usuário: O parâmetro '--content' original é obrigatório para validação.", true);
+        }
+        if (request.getSignature() == null || request.getSignature().trim().isEmpty()) {
+            return new SignatureResponse(null, false, "Erro do Usuário: O parâmetro '--signature' é obrigatório para validação.", true);
+        }
+
+        boolean isValid = FAKE_SIGNATURE.equals(request.getSignature());
 
         return new SignatureResponse(
                 request.getSignature(),
-                valid,
-                valid ? "Válida" : "Inválida"
+                isValid,
+                isValid ? "Assinatura válida" : "Assinatura inválida: divergência de hash",
+                false
         );
     }
 }
