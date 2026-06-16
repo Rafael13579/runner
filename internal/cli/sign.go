@@ -7,23 +7,34 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var content string
-
 var signCmd = &cobra.Command{
-	Use: "sign",
+	Use:   "sign",
+	Short: "Cria assinatura digital simulada",
 	Run: func(cmd *cobra.Command, args []string) {
+		if content == "" {
+			fmt.Println("Erro: --content é obrigatório")
+			cmd.Help()
+			return
+		}
+		if token == "" {
+			fmt.Println("Erro: --token é obrigatório")
+			cmd.Help()
+			return
+		}
 
-		resp, err := invoker.Sign(content)
+		resp, err := invoker.Sign(content, token)
 		if err != nil {
 			fmt.Println("Erro:", err)
 			return
 		}
 
-		fmt.Println("✔ Assinatura:", resp)
+		fmt.Println("✔ Assinatura:")
+		fmt.Println(resp)
 	},
 }
 
 func init() {
-	signCmd.Flags().StringVar(&content, "content", "", "Conteúdo")
+	signCmd.Flags().StringVar(&content, "content", "", "Conteúdo a ser assinado")
+	signCmd.Flags().StringVar(&token, "token", "", "Token ou credencial")
 	rootCmd.AddCommand(signCmd)
 }

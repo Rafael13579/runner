@@ -1,11 +1,18 @@
 package cli
 
 import (
-	"github.com/spf13/cobra"
 	"os"
+
+	"github.com/spf13/cobra"
 )
 
-var Version = "dev" // O GoReleaser substituirá isso no build
+var (
+	Version   = "dev" // O GoReleaser substituirá isso no build
+	content   string
+	token     string
+	signature string
+	jarPath   string
+)
 
 var rootCmd = &cobra.Command{
 	Use:     "assinatura",

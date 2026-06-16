@@ -8,13 +8,16 @@ public class SignatureResponse {
     private String signature;
     private boolean valid;
     private String message;
+    private boolean error;
 
-    public SignatureResponse() {}
+    public SignatureResponse() {
+    }
 
-    public SignatureResponse(String signature, boolean valid, String message) {
+    public SignatureResponse(String signature, boolean valid, String message, boolean error) {
         this.signature = signature;
         this.valid = valid;
         this.message = message;
+        this.error = error;
     }
 
     public String getSignature() {
@@ -39,5 +42,13 @@ public class SignatureResponse {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public boolean isError() {
+        return error;
+    }
+
+    public void setError(boolean error) {
+        this.error = error;
     }
 }
