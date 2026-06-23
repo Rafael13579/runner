@@ -5,9 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 	"os/exec"
 	"runtime"
 	"strings"
+	"time"
+
 	"github.com/kyriosdata/assinatura/internal/jdk"
 )
 
@@ -48,6 +51,8 @@ func execJava(args ...string) ExecResult {
 	return ExecResult{Stdout: strings.TrimSpace(stdout.String()), Stderr: strings.TrimSpace(stderr.String()), Err: err}
 }
 
+var httpClient = &http.Client{Timeout: 2 * time.Second}
+
 func Sign(content, token string) (string, error) {
 	if content == "" {
 		return "", errors.New("content é obrigatório")
@@ -56,6 +61,22 @@ func Sign(content, token string) (string, error) {
 		return "", errors.New("token é obrigatório")
 	}
 
+	reqBody, _ := json.Marshal(map[string]string{"content": content, "token": token})
+	resp, err := httpClient.Post("http://localhost:8080/api/sign", "application/json", bytes.NewBuffer(reqBody))
+
+	if err == nil {
+		defer resp.Body.Close()
+		var response SignResponse
+		if err := json.NewDecoder(resp.Body).Decode(&response); err == nil {
+			if response.Error {
+				return "", errors.New(response.Message)
+			}
+			return response.Signature, nil
+		}
+	}
+
+	fmt.Println("ℹ️ Servidor não detectado. Executando assinatura em modo local...")
+	
 	result := execJava("-jar", "assinador.jar", "sign", "--content", content, "--token", token)
 	if result.Err != nil {
 		return "", fmt.Errorf("erro ao executar assinador.jar: %w\n%s", result.Err, result.Stderr)
@@ -81,6 +102,23 @@ func Validate(content, signature string) (bool, error) {
 		return false, errors.New("signature é obrigatório")
 	}
 
+
+	reqBody, _ := json.Marshal(map[string]string{"content": content, "signature": signature})
+	resp, err := httpClient.Post("http://localhost:8080/api/validate", "application/json", bytes.NewBuffer(reqBody))
+
+	if err == nil {
+		defer resp.Body.Close()
+		var response SignResponse
+		if err := json.NewDecoder(resp.Body).Decode(&response); err == nil {
+			if response.Error {
+				return false, errors.New(response.Message)
+			}
+			return response.Valid, nil
+		}
+	}
+
+	fmt.Println("ℹ️ Servidor não detectado. Executando validação em modo local...")
+	
 	result := execJava("-jar", "assinador.jar", "validate", "--content", content, "--signature", signature)
 	if result.Err != nil {
 		return false, fmt.Errorf("erro ao executar assinador.jar: %w\n%s", result.Err, result.Stderr)
