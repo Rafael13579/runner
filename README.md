@@ -42,7 +42,9 @@ chmod +x assinatura-v0.1.0-linux-amd64
 git clone https://github.com/kyriosdata/runner
 cd runner
 go build ./cmd/assinatura
+go build ./cmd/simulador
 ./assinatura --version
+./simulador --version
 ```
 
 ## Como Usar
@@ -76,6 +78,30 @@ assinatura start
 assinatura stop
 ```
 
+### Simulador do HubSaúde
+
+```bash
+# Iniciar o simulador na porta padrão 8090
+simulador start
+
+# Usar uma porta específica
+simulador start --port 9090
+
+# Baixar o simulador.jar de uma URL alternativa e validar SHA-256
+simulador start --source https://example.org/simulador.jar --checksum <sha256>
+
+# Consultar status
+simulador status
+
+# Parar o simulador registrado
+simulador stop
+```
+
+O CLI procura `simulador.jar` em `~/.hubsaude/simulador/simulador.jar`.
+Quando o arquivo não existe localmente, o comando consulta o último GitHub Release
+do projeto e baixa o asset `simulador.jar`; se existir `simulador.jar.sha256`,
+o checksum é validado antes da execução.
+
 ## Desenvolvimento
 
 ### Build local
@@ -85,6 +111,14 @@ go build ./...
 go vet ./...
 go test ./...
 ```
+
+### Decisões de arquitetura
+
+As decisões técnicas específicas desta implementação ficam em [`docs/adr`](docs/adr):
+
+- ADR 0001: CLIs em Go
+- ADR 0002: Registro de processos em `~/.hubsaude`
+- ADR 0003: Obtenção dinâmica do `simulador.jar`
 
 ### Testes
 
@@ -97,12 +131,15 @@ go test ./...
 ```bash
 # Linux
 GOOS=linux GOARCH=amd64 go build -o dist/assinatura-linux-amd64 ./cmd/assinatura
+GOOS=linux GOARCH=amd64 go build -o dist/simulador-linux-amd64 ./cmd/simulador
 
 # Windows
 GOOS=windows GOARCH=amd64 go build -o dist/assinatura-windows-amd64.exe ./cmd/assinatura
+GOOS=windows GOARCH=amd64 go build -o dist/simulador-windows-amd64.exe ./cmd/simulador
 
 # macOS
 GOOS=darwin GOARCH=amd64 go build -o dist/assinatura-darwin-amd64 ./cmd/assinatura
+GOOS=darwin GOARCH=amd64 go build -o dist/simulador-darwin-amd64 ./cmd/simulador
 ```
 
 ## Verificação de Integridade
@@ -148,7 +185,7 @@ runner/
 
 ## Especificação
 
-Consulte a [especificação completa](https://github.com/kyriosdata/runner/blob/main/SPECIFICATION.md) para:
+Consulte a [especificação completa](https://github.com/kyriosdata/runner/blob/25e12058b62da03f106653cd95dc509baa265341/SPECIFICATION.md) para:
 - Histórias de usuário (US-01 a US-05)
 - Critérios de aceitação
 - Requisitos funcionais e não-funcionais
@@ -173,18 +210,22 @@ Ver [CONTRIBUTING.md](CONTRIBUTING.md) para mais detalhes.
 - [x] Pipeline CI/CD multiplataforma
 - [x] GoReleaser + Cosign
 
-### Sprint 2 (Próxima)
-- [ ] Assinador.jar com simulação
-- [ ] Invocação local (modo CLI)
-- [ ] Comandos `sign` e `validate`
+### Sprint 2
+- [x] Assinador.jar com simulação
+- [x] Invocação local (modo CLI)
+- [x] Comandos `sign` e `validate`
 
 ### Sprint 3
-- [ ] Modo servidor HTTP
-- [ ] Integração PKCS#11
+- [x] Modo servidor HTTP
+- [ ] Integração PKCS#11 real com SoftHSM2
 
 ### Sprint 4
-- [ ] Simulador do HubSaúde
-- [ ] Download automático
+- [x] CLI `simulador` com comandos `start`, `stop` e `status`
+- [x] Registro de PID, porta e JAR em `~/.hubsaude/simulador.json`
+- [x] Health check/readiness via HTTP
+- [x] Download automático de `simulador.jar` via GitHub Releases ou `--source`
+- [x] Cache local e verificação SHA-256
+- [x] Build e release multiplataforma do CLI `simulador`
 
 ## Licença
 
