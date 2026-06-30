@@ -10,8 +10,6 @@ import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-import java.util.Arrays;
-
 @SpringBootApplication
 @EnableScheduling
 public class AssinadorApplication {
