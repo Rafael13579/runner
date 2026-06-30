@@ -47,9 +47,9 @@ var startCmd = &cobra.Command{
 
 		javaArgs := []string{
 			fmt.Sprintf("-Dserver.port=%s", port),
-			fmt.Sprintf("--assinador.timeout.minutes=%d", timeout),
 			"-jar",
 			jarPath,
+			fmt.Sprintf("--assinador.timeout.minutes=%d", timeout),
 		}
 
 		c := exec.Command(javaBin, javaArgs...)
