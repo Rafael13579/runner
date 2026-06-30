@@ -37,3 +37,11 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish simulador.jar when available
+        if: hashFiles('simulador.jar') != ''
+        run: |
+          sha256sum simulador.jar > simulador.jar.sha256
+          gh release upload "${GITHUB_REF_NAME}" simulador.jar simulador.jar.sha256 --clobber
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

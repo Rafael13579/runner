@@ -21,11 +21,22 @@ jobs:
         with:
           go-version: '1.25'
 
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
       - name: Run go vet
         run: go vet ./...
 
       - name: Run tests
         run: go test ./...
+
+      - name: Run Java tests
+        working-directory: assinador
+        shell: bash
+        run: ./mvnw test
 
   build:
     needs: test
@@ -40,13 +51,19 @@ jobs:
           go-version: '1.25'
 
       - name: Build for Linux (amd64)
-        run: GOOS=linux GOARCH=amd64 go build -o dist/assinatura-linux-amd64 ./cmd/assinatura
+        run: |
+          GOOS=linux GOARCH=amd64 go build -o dist/assinatura-linux-amd64 ./cmd/assinatura
+          GOOS=linux GOARCH=amd64 go build -o dist/simulador-linux-amd64 ./cmd/simulador
 
       - name: Build for Windows (amd64)
-        run: GOOS=windows GOARCH=amd64 go build -o dist/assinatura-windows-amd64.exe ./cmd/assinatura
+        run: |
+          GOOS=windows GOARCH=amd64 go build -o dist/assinatura-windows-amd64.exe ./cmd/assinatura
+          GOOS=windows GOARCH=amd64 go build -o dist/simulador-windows-amd64.exe ./cmd/simulador
 
       - name: Build for macOS (amd64)
-        run: GOOS=darwin GOARCH=amd64 go build -o dist/assinatura-darwin-amd64 ./cmd/assinatura
+        run: |
+          GOOS=darwin GOARCH=amd64 go build -o dist/assinatura-darwin-amd64 ./cmd/assinatura
+          GOOS=darwin GOARCH=amd64 go build -o dist/simulador-darwin-amd64 ./cmd/simulador
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
