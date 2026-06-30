@@ -4,6 +4,8 @@ import br.ufg.inf.assinador.domain.SignRequest;
 import br.ufg.inf.assinador.domain.SignatureResponse;
 import br.ufg.inf.assinador.domain.ValidateRequest;
 import br.ufg.inf.assinador.service.FakeSignatureService;
+import br.ufg.inf.assinador.service.Pkcs11SignatureService;
+import br.ufg.inf.assinador.service.SignatureService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.WebApplicationType;
@@ -26,7 +28,7 @@ public class AssinadorApplication {
 
 	private static void executeLocalCommand(String[] args) {
 		String command = args[0];
-		FakeSignatureService service = new FakeSignatureService();
+		SignatureService service = localSignatureService();
 		ObjectMapper mapper = new ObjectMapper();
 		SignatureResponse response;
 
@@ -49,6 +51,14 @@ public class AssinadorApplication {
 			} catch (Exception ignored) {}
 			System.exit(1);
 		}
+	}
+
+	private static SignatureService localSignatureService() {
+		String mode = System.getProperty("assinador.mode", System.getenv().getOrDefault("ASSINADOR_MODE", "fake"));
+		if ("pkcs11".equalsIgnoreCase(mode)) {
+			return new Pkcs11SignatureService();
+		}
+		return new FakeSignatureService();
 	}
 
 	private static SignRequest parseSignArgs(String[] args) {

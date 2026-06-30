@@ -3,9 +3,11 @@ package br.ufg.inf.assinador.service;
 import br.ufg.inf.assinador.domain.SignRequest;
 import br.ufg.inf.assinador.domain.SignatureResponse;
 import br.ufg.inf.assinador.domain.ValidateRequest;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 @Service
+@ConditionalOnProperty(name = "assinador.mode", havingValue = "fake", matchIfMissing = true)
 public class FakeSignatureService implements SignatureService {
 
     private static final String FAKE_SIGNATURE = "MOCKED_SIGNATURE_BASE64_==";

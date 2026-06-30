@@ -119,6 +119,7 @@ As decisões técnicas específicas desta implementação ficam em [`docs/adr`](
 - ADR 0001: CLIs em Go
 - ADR 0002: Registro de processos em `~/.hubsaude`
 - ADR 0003: Obtenção dinâmica do `simulador.jar`
+- ADR 0004: Serviço PKCS#11 opcional
 
 ### Testes
 
@@ -217,7 +218,8 @@ Ver [CONTRIBUTING.md](CONTRIBUTING.md) para mais detalhes.
 
 ### Sprint 3
 - [x] Modo servidor HTTP
-- [ ] Integração PKCS#11 real com SoftHSM2
+- [x] Integração PKCS#11 via `SunPKCS11`
+- [x] Teste de integração opcional para token/SoftHSM2 configurado
 
 ### Sprint 4
 - [x] CLI `simulador` com comandos `start`, `stop` e `status`

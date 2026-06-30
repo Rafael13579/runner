@@ -1,3 +1,11 @@
 spring:
   application:
     name: assinador
+
+assinador:
+  mode: fake
+  pkcs11:
+    config-path: ${PKCS11_CONFIG_PATH:}
+    pin: ${PKCS11_PIN:}
+    alias: ${PKCS11_ALIAS:}
+    algorithm: ${PKCS11_ALGORITHM:SHA256withRSA}
