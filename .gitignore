@@ -30,6 +30,8 @@ vendor/
 # Local development
 dist/
 build/
+target/
+**/target/
 .hubsaude/
 
 # Generated files
